@@ -21,11 +21,11 @@ Bcrypt
 ### Como testar? ###
 
 Terminal 1:
-    cd C:\Users\zouker\Documents\GitHub\Trabalho_SD\sd
+    cd C:\Users\[user]\Documents\GitHub\Trabalho_SD\sd
     docker compose up --build
 
 Terminal 2:
-    cd C:\Users\zouker\Documents\GitHub\Trabalho_SD\sd\src\auth-api
+    cd C:\Users\[user]\Documents\GitHub\Trabalho_SD\sd\src\auth-api
     npm i bcrypt cors knex express jsonwebtoken pg validator
     node index.js
 
@@ -34,3 +34,5 @@ Para criar as tabelas na base de dados:
 
 Para criar a base de dados padrão: 
     npx knex seed:run
+
+Base do trabalho fornecida pelo professor: https://bitbucket.org/luisteofilo/sd/src/master/
