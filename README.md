@@ -3,9 +3,9 @@
 Trabalho feito para a disciplina de Serviços Distribuidos. Sistema de autenticação com crud de escolas. API documentada em swagger.
 
 Os utilizadores tem 3 niveis de cargos:
-Admin: Pode gerir qualquer conta. Pode criar, editar e eliminar qualquer utilizador. Pode criar, editar e eliminar qualquer escola. Pode ver lista de utilizadores e escolas.
-Edit: Pode gerir a propria conta. Pode criar escolas. Pode editar e eliminar as suas escolas. Pode ver lista de escolas.
-View: Pode gerir a propria conta. Pode ver lista de escolas.
+<br>Admin: Pode gerir qualquer conta. Pode criar, editar e eliminar qualquer utilizador. Pode criar, editar e eliminar qualquer escola. Pode ver lista de utilizadores e escolas.
+<br>Edit: Pode gerir a propria conta. Pode criar escolas. Pode editar e eliminar as suas escolas. Pode ver lista de escolas.
+<br>View: Pode gerir a propria conta. Pode ver lista de escolas.
 
 ### Tecnologias utilizadas ###
 
