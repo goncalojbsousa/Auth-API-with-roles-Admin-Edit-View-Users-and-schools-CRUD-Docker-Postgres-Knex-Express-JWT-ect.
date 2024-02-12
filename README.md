@@ -1,6 +1,6 @@
 ### Introdução ###
 
-Trabalho feito para a disciplina de Serviços Distribuidos. Sistema de autenticação com crud de escolas. API documentada em swagger.
+Trabalho feito para a disciplina de Serviços Distribuidos. Sistema de autenticação com crud de escolas e users. API documentada em swagger.
 
 Os utilizadores tem 3 niveis de cargos:
 Admin: Pode gerir qualquer conta. Pode criar, editar e eliminar qualquer utilizador. Pode criar, editar e eliminar qualquer escola. Pode ver lista de utilizadores e escolas.
