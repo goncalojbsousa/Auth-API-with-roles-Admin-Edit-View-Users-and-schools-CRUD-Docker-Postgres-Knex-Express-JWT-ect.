@@ -1,17 +1,36 @@
-# Distributed Systems Development Kit #
+### Introdução ###
 
-### Introduction ###
+Trabalho feito para a disciplina de Serviços Distribuidos. Sistema de autenticação com crud de escolas. API documentada em swagger.
 
-This environment allows you to easily install the development environment and its dependencies.
-This is to be used for the project in Distributed Systems course at TPSI.
+Os utilizadores tem 3 niveis de cargos:
+Admin: Pode gerir qualquer conta. Pode criar, editar e eliminar qualquer utilizador. Pode criar, editar e eliminar qualquer escola. Pode ver lista de utilizadores e escolas.
+Edit: Pode gerir a propria conta. Pode criar escolas. Pode editar e eliminar as suas escolas. Pode ver lista de escolas.
+View: Pode gerir a propria conta. Pode ver lista de escolas.
 
-### How to I setup my development environment? ###
+### Tecnologias utilizadas ###
 
-* Create an **.env** file - you can use **.env.example** as a reference
-* Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* Create the necessary Docker Images and Containers by running the following command in the project's root folder:
-```
-docker-compose up --build
-```
-___
-#### _TPSI @ipvc/estg, 2022-2023_ ####
+Docker
+Knex
+Express
+Postgres
+Cors
+Validator
+JsonWebToken
+Bcrypt
+
+### Como testar? ###
+
+Terminal 1:
+    cd C:\Users\zouker\Documents\GitHub\Trabalho_SD\sd
+    docker compose up --build
+
+Terminal 2:
+    cd C:\Users\zouker\Documents\GitHub\Trabalho_SD\sd\src\auth-api
+    npm i bcrypt cors knex express jsonwebtoken pg validator
+    node index.js
+
+Para criar as tabelas na base de dados:
+    npx knex migrate:latest
+
+Para criar a base de dados padrão: 
+    npx knex seed:run

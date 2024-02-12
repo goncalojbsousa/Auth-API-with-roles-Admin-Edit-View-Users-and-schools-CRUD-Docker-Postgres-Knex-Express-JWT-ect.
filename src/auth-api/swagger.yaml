@@ -1,0 +1,256 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Sistema de Gestão de Utilizadores e Escolas
+  description: API para registro, autenticação, e gestão de utilizadores e escolas.
+host: localhost:3000
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /register:
+    post:
+      summary: Regista um novo utilizador
+      description: Cria um novo utilizador com um email, nome de utilizador, e senha.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              user:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        201:
+          description: Utilizador registrado com sucesso
+        400:
+          description: Dados inválidos fornecidos
+        500:
+          description: Erro ao registrar utilizador
+
+  /login:
+    post:
+      summary: Autentica um utilizador
+      description: Realiza o login do utilizador, retornando um token JWT se as credenciais forem válidas.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Login bem sucedido, retorna token
+        401:
+          description: Credenciais inválidas
+        500:
+          description: Erro ao fazer login
+
+  /user/editar/{id}:
+    put:
+      summary: Edita um utilizador existente
+      description: Permite a editar um utilizador existente. Apenas o admin pode editar a rule. Utilizadores view e edit apenas podem editar a propria conta. Utilizadores admin não tem restrições.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+          description: ID do utilizador a ser editado
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              user:
+                type: string
+              password:
+                type: string
+              rule:
+                type: string
+      responses:
+        200:
+          description: Dados do utilizador atualizados com sucesso
+        403:
+          description: Acesso proibido
+        404:
+          description: Utilizador não encontrado
+        500:
+          description: Erro ao atualizar dados do utilizador
+
+  /users/eliminar/{id}:
+    delete:
+      summary: Elimina um utilizador
+      description: Permite a exclusão de um utilizador. Utilizadores view e edit apenas podem eliminar a propria conta. Utilizadores admin não tem restrições.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+          description: ID do utilizador a ser eliminado
+      responses:
+        200:
+          description: Utilizador eliminado com sucesso
+        403:
+          description: Acesso proibido
+        404:
+          description: Utilizador não encontrado
+        500:
+          description: Erro ao eliminar utilizador
+
+  /users:
+    get:
+      summary: Lista todos os utilizador
+      description: Retorna uma lista de todos os utilizador. Acesso restrito ao admin.
+      responses:
+        200:
+          description: Lista de utilizadores
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        500:
+          description: Erro ao obter informações dos utilizadores
+
+  /escolas/adicionar:
+    post:
+      summary: Adiciona uma nova escola
+      description: Permite a adição de uma nova escola ao sistema. Acesso restrito a utilizador com permissões de admin ou edição.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              nome:
+                type: string
+              responsavel:
+                type: string
+              contacto:
+                type: string
+              morada:
+                type: string
+      responses:
+        201:
+          description: Escola adicionada com sucesso
+        403:
+          description: Acesso proibido
+        500:
+          description: Erro ao adicionar escola
+
+  /escolas/editar/{id}:
+    put:
+      summary: Edita uma escola existente
+      description: Permite a edição de informações de uma escola existente. Acesso restrito a utilizador com permissões de admin ou edição caso sejam donos da escola. 
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+          description: ID da escola a ser editada
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              nome:
+                type: string
+              responsavel:
+                type: string
+              contacto:
+                type: string
+              morada:
+                type: string
+      responses:
+        200:
+          description: Informações da escola atualizadas com sucesso
+        403:
+          description: Acesso proibido
+        404:
+          description: Escola não encontrada
+        500:
+          description: Erro ao atualizar informações da escola
+
+  /escolas/eliminar/{id}:
+    delete:
+      summary: Elimina uma escola
+      description: Permite a exclusão de uma escola do sistema. Acesso restrito a utilizador com permissões de admin ou edição caso sejam donos da escola. 
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+          description: ID da escola a ser eliminada
+      responses:
+        200:
+          description: Escola eliminada com sucesso
+        403:
+          description: Acesso proibido
+        404:
+          description: Escola não encontrada
+        500:
+          description: Erro ao eliminar escola
+
+  /escolas:
+    get:
+      summary: Lista todas as escolas
+      description: Retorna uma lista de todas as escolas no sistema.
+      responses:
+        200:
+          description: Lista de escolas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Escola'
+        500:
+          description: Erro ao obter informações das escolas
+
+definitions:
+  User:
+    type: object
+    properties:
+      id:
+        type: string
+      user:
+        type: string
+      email:
+        type: string
+
+  Escola:
+    type: object
+    properties:
+      id:
+        type: string
+      nome:
+        type: string
+      responsavel:
+        type: string
+      contacto:
+        type: string
+      morada:
+        type: string
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - Bearer: []

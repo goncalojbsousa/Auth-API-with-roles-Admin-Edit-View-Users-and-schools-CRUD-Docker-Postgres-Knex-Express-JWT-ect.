@@ -1,8 +1,8 @@
 module.exports = {
-    db: {
         client: 'pg',
         connection: {
-            host: 'auth-db',
+            host: 'localhost',
+            port: 15432,
             user: 'sd',
             password: 'sd',
             database: 'sd'
@@ -10,6 +10,8 @@ module.exports = {
         migrations: {
             tableName: 'knex_migrations',
             directory: './migrations'
-        }
-    }
+        },
+        seeds: {
+            directory: './seeds'
+          }
 };
