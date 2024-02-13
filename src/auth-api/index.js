@@ -5,10 +5,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { isEmail } = require('validator');
 
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./swagger.yaml');
-
 const app = express();
 const PORT = 3000;
 
@@ -19,6 +15,7 @@ const db = knex(require('./knexfile'));
 // middleware de autorização
 const authorizeUser = (rules) => {
   return (req, res, next) => {
+    //compara a rules do user com a rules passadas por parametro
     if (!rules.includes(req.user.rule)) {
       return res.status(403).json({ message: 'Acesso proibido' });
     }
@@ -34,19 +31,11 @@ const authenticateUser = (req, res, next) => {
     return res.status(401).json({ message: 'Token de autenticação não fornecido' });
   }
 
-  console.log("Token recebido: ", token);
-
+  // verifica se o token é valido, guarda o id e rule no decodedToken
   jwt.verify(token, "secret", (err, decodedToken) => {
     if (err) {
       console.error("Erro ao verificar o token:", err);
       return res.status(401).json({ message: 'Token de autenticação inválido', token: token });
-    }
-
-    console.log("Token decodificado:", decodedToken);
-
-    // verifica se o token tem o userid
-    if (!decodedToken.userId) {
-      return res.status(401).json({ message: 'Token de autenticação inválido - ID do utilizador não encontrado' });
     }
 
     // atribui o id e a rule ao utilizador
@@ -54,9 +43,6 @@ const authenticateUser = (req, res, next) => {
       id: decodedToken.userId,
       rule: decodedToken.rule
     };
-
-    console.log("Id do user: ", decodedToken.userId);
-    console.log("Rule do user: ", decodedToken.rule);
 
     next();
   });
@@ -83,6 +69,12 @@ app.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Este email já está registrado' });
     }
 
+    // verifica as condiçoes da password
+    if (password.length < 6 || !/\d/.test(password)) {
+      return res.status(400).json({ message: 'A password deve ter pelo menos 6 caracteres e conter pelo menos um número' });
+    }
+
+    // guarda os dados do user 
     await db('users').insert({ user, email, password: hashedPassword });
     res.status(201).json({ message: 'Utilizador registrado com sucesso' });
   } catch (error) {
@@ -94,20 +86,24 @@ app.post('/register', async (req, res) => {
 // rota de login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log("jwt: ", process.env.JWT_SECRET)
+
   try {
+    // puxa os dados do user da db
     const user = await db('users').where({ email }).first();
 
+    // verifica se as credenciais sao validas
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Credenciais inválidas' });
     }
 
+    // guarda o userid e a rule para passar para o token
     const tokenPayload = {
       userId: user.id,
       rule: user.rule 
     };
 
-    const token = jwt.sign(tokenPayload, "secret", { expiresIn: '1h' });
+    //cria o token de autenticacao
+    const token = jwt.sign(tokenPayload, "secret", { expiresIn: '1h' });  //n consegui por o secret a vir da .env
 
     res.json({ token });
   } catch (error) {
@@ -120,7 +116,7 @@ app.post('/login', async (req, res) => {
  *  ENDPOINTS DO USER
  * **/
 
-// rota para editar o user, apenas o admin pode editar a role
+// rota para editar o user, apenas o admin pode editar a rule
 app.put('/user/editar/:id', authenticateUser, authorizeUser(['admin', 'edit', 'view']), async (req, res) => {
   const userId = req.params.id;
   const { user, password, rule } = req.body;
@@ -134,30 +130,30 @@ app.put('/user/editar/:id', authenticateUser, authorizeUser(['admin', 'edit', 'v
       return res.status(404).json({ error: 'Utilizador não encontrado' });
     }
 
-    // Somente o admin pode editar a role do usuário
+    // somente o admin pode editar a rule do usuário
     if (loggedInUserRule !== 'admin') {
-      delete req.body.rule; // Remove a tentativa de edição da regra se o usuário não for admin
+      delete req.body.rule;
     }
 
-    // Verifica se o usuário tem permissão para editar o usuário
+    // verifica se o usuário tem permissão para editar o usuário
     if (userId !== loggedInUserId.toString() && loggedInUserRule !== 'admin') {
       return res.status(403).json({ error: 'Acesso proibido' });
     }
 
-    // Atualiza o nome do user apenas se for fornecido
+    // atualiza o nome do user apenas se for fornecido
     if (user) existingUser.user = user;
 
-    // Encripta a senha com o bcrypt
+    // encripta a senha com o bcrypt
     if (password) {
       existingUser.password = await bcrypt.hash(password, 10);
     }
 
-    // Atualiza a role do usuário apenas se o usuário for admin
+    // atualiza a rule do usuário apenas se o usuário for admin
     if (rule && loggedInUserRule === 'admin') {
       existingUser.rule = rule;
     }
 
-    // Atualiza a base de dados
+    // atualiza a base de dados
     await db('users').where({ id: userId }).update(existingUser);
 
     res.status(200).json({ message: 'Dados do utilizador atualizados com sucesso' });
@@ -198,6 +194,7 @@ app.delete('/users/eliminar/:id', authenticateUser, authorizeUser(['admin', 'edi
 
 app.get('/users', authenticateUser, authorizeUser(['admin']), async (req, res) => {
   try {
+    // puxa os dados da db
     const users = await db('users').select('id', 'user', 'email');
     res.json(users);
   } catch (error) {
@@ -292,7 +289,8 @@ app.delete('/escolas/eliminar/:id', authenticateUser, authorizeUser(['admin', 'e
 });
 
 app.get('/escolas', async (req, res) => {
-  try {
+  try {    
+    // puxa os dados da db
     const escolas = await db('escolas').select('id', 'nome', 'responsavel', 'contacto', 'morada');
     res.json(escolas);
   } catch (error) {
